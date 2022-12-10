@@ -4,8 +4,11 @@ import {
     loadAccounts,
     addNewAccount,
     findAccount,
-    updateAccount,
-    deleteAccount
+    depositMoney,
+    deleteAccount,
+    withdrawMoney,
+    transferMoney,
+    updateCredit
 } from "../controllers/controllers.js";
 
 router.get("/accounts", (req, res) => {
@@ -23,7 +26,7 @@ router.get("/accounts/:id", (req, res) => {
 });
 
 router.post("/accounts", (req, res) => {
-    console.log(req.body);
+  //add new account
     try {
       const createAccount = addNewAccount(req.body);
       res.status(201).send(createAccount);
@@ -32,13 +35,57 @@ router.post("/accounts", (req, res) => {
     }
 });
 
-router.put("/accounts/:id", (req, res) => {
-    // Update the account with the specified id
+router.put("/accounts/:id/deposit", (req, res) => {
+    // deposit money to a specific account
+    const { id } = req.params;
+    const moneyToDeposit = req.body;
+    try {
+      const depositMoneyById = depositMoney(id,moneyToDeposit);
+      res.status(201).send(depositMoneyById);
+    } catch (e) {
+      res.status(400).send({ error: e.message });
+    }
+});
+
+router.put("/accounts/:id/withdraw", (req, res) => {
+  // withdraw money to a specific account
+  const { id } = req.params;
+  const  moneyToWithdraw = req.body;
+  try {
+    const withdrawMoneyById = withdrawMoney(id, moneyToWithdraw);
+    res.status(201).send(withdrawMoneyById);
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
+});
+
+router.put("/accounts/transfer", (req, res) => {
+  // transfer money from one account to another
+  const {idToWithdraw,idToDeposit,amount} = req.body;
+  try {
+    const transfer= transferMoney(idToWithdraw,idToDeposit,amount);
+    res.status(201).send(transfer);
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
+});
+
+router.put("/accounts/:id/credit", (req, res) => {
+  // change credit
+  const { id } = req.params;
+  const credit = req.body;
+  try {
+    const creditUpdateFunc= updateCredit(id,credit);
+    res.status(201).send(creditUpdateFunc);
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
 });
 
 router.delete("/accounts/:id", (req, res) => {
+  // delete the account with the specified id
     try {
-        res.status(200).send(deleteMovie(req.params.id));
+        res.status(200).send(deleteAccount(req.params.id));
       } catch (e) {
         res.status(400).send({ error: e.message });
       }
